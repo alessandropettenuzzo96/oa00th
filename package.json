@@ -1,0 +1,20 @@
+{
+  "name": "oa00th",
+  "version": "1.0.0",
+  "description": "A simple wrapper util SDK for n00z OAuthServer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://alessandroPettenuzzo@bitbucket.org/alessandroPettenuzzo/oa00th.git"
+  },
+  "keywords": [
+    "oauth2",
+    "n00z"
+  ],
+  "author": "Alessandro Pettenuzzo",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/alessandroPettenuzzo/oa00th#readme"
+}
