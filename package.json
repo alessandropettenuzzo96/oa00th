@@ -16,5 +16,8 @@
   ],
   "author": "Alessandro Pettenuzzo",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/alessandroPettenuzzo/oa00th#readme"
+  "homepage": "https://bitbucket.org/alessandroPettenuzzo/oa00th#readme",
+  "dependencies": {
+    "jsonwebtoken": "^8.1.1"
+  }
 }
