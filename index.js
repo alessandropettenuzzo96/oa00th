@@ -6,7 +6,7 @@ exports = (clientId, clientSecret, getUserFromid) => {
     return {
         authenticate: (scope, authFailedHandler) => {
             return (req, res, next) => {
-                let header = req.headers['Authentication'];
+                let header = req.headers['authorization'];
                 if(!header) return authFailedHandler({ missingToken: true, message: 'Authentication header not passed' });
                 header = header.split(' ');
                 if(header.length !== 2) return authFailedHandler({ message: 'Authentication header malformed' });
@@ -87,7 +87,7 @@ exports = (clientId, clientSecret, getUserFromid) => {
         deleteUser: (userId) => {
             return new Promise((resolve, reject) => {
                 axios.delete(BASE_API_PATH+'app/'+clientId+'/users/'+userId).then((response) => {
-                    if( !response || response.status !== 'revoke' ) return reject('Unexpected response');
+                    if( !response || response.status !== 'deleted' ) return reject('Unexpected response');
                     return resolve();
                 }).catch((err) => {
                     return reject(err.message);
