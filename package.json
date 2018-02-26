@@ -18,6 +18,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/alessandroPettenuzzo/oa00th#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "jsonwebtoken": "^8.1.1"
   }
 }

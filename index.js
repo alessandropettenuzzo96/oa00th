@@ -1,6 +1,8 @@
 import * as jwt from 'jsonwebtoken';
+let axios = require('axios');
 
 exports = (clientId, clientSecret, getUserFromid) => {
+    let BASE_API_PATH = 'http://oauth.k1nd3rg4rt3n.com/';
     return {
         authenticate: (scope, authFailedHandler) => {
             return (req, res, next) => {
@@ -36,5 +38,45 @@ exports = (clientId, clientSecret, getUserFromid) => {
                 })
             }
         },
+
+        login: (username, password, scopes) => {
+            return new Promise((resolve, reject) => {
+                axios.post(BASE_API_PATH+'oauth/token', { client_id: clientId, client_secret: clientSecret, username: username, password: password, grant_type: 'password', scopes: scopes.join(' ') }).then((response) => {
+                    if(!response) return reject('Unexpected response');
+                    return resolve(response);
+                }).catch((err) => {
+                    return resolve(err.message);
+                });
+            });
+        },
+
+        refresh: (refreshToken) => {
+            return new Promise((resolve, reject) => {
+                axios.post(BASE_API_PATH+'oauth/token', { client_id: clientId, client_secret: clientSecret, grant_type: 'refresh_token', refresh_token: refreshToken }).then((response) => {
+                    if(!response) return reject('Unexpected response');
+                    return resolve(response);
+                }).catch((err) => {
+                    return resolve(err.message);
+                })
+            });
+        },
+
+        logout: (accessToken) => {
+            return new Promise((resolve, reject) => {
+
+            });
+        },
+
+        createUser: (username, password, scopes) => {
+            return new Promise((resolve, reject) => {
+                if(!scopes) return reject('Scopes not defined');
+                axios.post(BASE_API_PATH+"app/"+clientId+"/users/create", { client_id: clientId, client_secret: clientSecret, username: username, password: password, scope: scopes.join(' ')}).then((user) => {
+                    if(!user) return reject('Unexpected response');
+                    return resolve(user);
+                }).catch((err) => {
+                    return reject(err.message);
+                });
+            });
+        }
     }
 };
