@@ -17,6 +17,8 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
             let token = header[1];
             if (!token) return authFailedHandler(req, res, next, {message: 'Authentication header not contain token'});
             jwt.verify(token, that.clientSecret, (err, decoded) => {
+                console.log(JSON.stringify(err));
+                console.log(JSON.stringify(decoded));
                 if (err || !decoded || !decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken'});
                 decoded.inn = new Buffer(decoded.inn, 'base64').toString('utf8');
                 if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
