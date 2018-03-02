@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+let jwt = require('jsonwebtoken');
 let axios = require('axios');
 
 export class Oa00th {
