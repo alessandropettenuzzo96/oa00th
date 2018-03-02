@@ -17,35 +17,35 @@ export class Oa00th {
         let that = this;
         return (req, res, next) => {
             let header = req.headers['authorization'];
-            if (!header) return authFailedHandler({
+            if (!header) return authFailedHandler(req, res, next, {
                 missingToken: true,
                 message: 'Authentication header not passed'
             });
             header = header.split(' ');
-            if (header.length !== 2) return authFailedHandler({message: 'Authentication header malformed'});
-            if (header[0] !== 'Bearer') return authFailedHandler({message: 'Authentication header not Bearer type'});
+            if (header.length !== 2) return authFailedHandler(req, res, next, {message: 'Authentication header malformed'});
+            if (header[0] !== 'Bearer') return authFailedHandler(req, res, next, {message: 'Authentication header not Bearer type'});
             let token = header[1];
-            if (!token) return authFailedHandler({message: 'Authentication header not contain token'});
+            if (!token) return authFailedHandler(req, res, next, {message: 'Authentication header not contain token'});
             jwt.verify(token, that.clientSecret, (err, decoded) => {
-                if (err || !decoded || !decoded.inn) return authFailedHandler({message: 'Invalid AccessToken'});
+                if (err || !decoded || !decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken'});
                 decoded.inn = new Buffer(decoded.inn, 'base64').toString('utf8');
-                if (!decoded.inn) return authFailedHandler({message: 'Invalid AccessToken encoded format.'});
+                if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
                 jwt.decode(decoded.inn, (err, inner) => {
-                    if (err || !inner || !inner.usr || !inner.exp || inner.iss || inner.aud || !inner.scp) return authFailedHandler({message: 'Token not contain valid informations'});
+                    if (err || !inner || !inner.usr || !inner.exp || inner.iss || inner.aud || !inner.scp) return authFailedHandler(req, res, next, {message: 'Token not contain valid informations'});
                     let usr = inner.usr;
                     let exp = inner.exp;
                     let aud = inner.aud;
                     let scp = inner.scp.split(' ');
                     let iss = inner.iss;
-                    if ((new Date()).getTime() >= exp) return authFailedHandler({
+                    if ((new Date()).getTime() >= exp) return authFailedHandler(req, res, next, {
                         isExpired: true,
                         message: 'Token is expired'
                     });
-                    if (aud !== that.clientId) return authFailedHandler({message: 'Token has invalid audience'});
-                    if (iss !== 'n00z_oauth_server') return authFailedHandler({message: 'Token has invalid issuer'});
+                    if (aud !== that.clientId) return authFailedHandler(req, res, next, {message: 'Token has invalid audience'});
+                    if (iss !== 'n00z_oauth_server') return authFailedHandler(req, res, next, {message: 'Token has invalid issuer'});
                     if (scp.filter((el) => {
                             scope.indexOf(el)
-                        }).length !== scope.length) return authFailedHandler({
+                        }).length !== scope.length) return authFailedHandler(req, res, next, {
                         insufficientScopes: true,
                         message: 'User not has sufficient privileges'
                     });
@@ -53,7 +53,7 @@ export class Oa00th {
                         req.user = user;
                         next();
                     }).catch((err) => {
-                        authFailedHandler(err);
+                        authFailedHandler(req, res, next, err);
                     });
                 })
             })
