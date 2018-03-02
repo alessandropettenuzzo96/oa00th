@@ -1,19 +1,9 @@
 let jwt = require('jsonwebtoken');
 let axios = require('axios');
+const BASE_API_PATH = 'http://oauth.k1nd3rg4rt3n.com/';
 
-export class Oa00th {
-    private BASE_API_PATH = 'http://oauth.k1nd3rg4rt3n.com/';
-    clientId = null;
-    clientSecret = null;
-    getUserFromId = (userId) => {};
-
-    public constructor(clientId, clientSecret, getUserFromId) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.getUserFromId = getUserFromId;
-    }
-
-    authenticate(scope, authFailedHandler) {
+module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
+    this.authenticate = function(scope, authFailedHandler) {
         let that = this;
         return (req, res, next) => {
             let header = req.headers['authorization'];
@@ -58,9 +48,9 @@ export class Oa00th {
                 })
             })
         }
-    }
+    };
 
-    login(username, password, scopes) {
+    this.login = function(username, password, scopes) {
         let that = this;
         return new Promise((resolve, reject) => {
             axios.post(that.BASE_API_PATH + 'oauth/token', {
@@ -77,9 +67,9 @@ export class Oa00th {
                 return reject(err.message);
             });
         });
-    }
+    };
 
-    refresh(refreshToken) {
+    this.refresh = function(refreshToken) {
         let that = this;
         return new Promise((resolve, reject) => {
             axios.post(that.BASE_API_PATH + 'oauth/token', {
@@ -94,9 +84,9 @@ export class Oa00th {
                 return reject(err.message);
             })
         });
-    }
+    };
 
-    logout(refreshToken) {
+    this.logout = function(refreshToken) {
         return new Promise((resolve, reject) => {
             axios.post(that.BASE_API_PATH + 'oauth/revoke', {refresh_token: refreshToken}).then((response) => {
                 if (!response || response.status !== 'revoked') return reject('Unexpected response');
@@ -105,9 +95,9 @@ export class Oa00th {
                 return reject(err.message);
             });
         });
-    }
+    };
 
-    createUser(username, password, scopes) {
+    this.createUser = function(username, password, scopes) {
         let that = this;
         return new Promise((resolve, reject) => {
             if (!scopes) return reject('Scopes not defined');
@@ -124,9 +114,9 @@ export class Oa00th {
                 return reject(err.message);
             });
         });
-    }
+    };
 
-    deleteUser(userId) {
+    this.deleteUser = function(userId) {
         let that = this;
         return new Promise((resolve, reject) => {
             axios.delete(that.BASE_API_PATH + 'app/' + that.clientId + '/users/' + userId).then((response) => {
@@ -136,6 +126,6 @@ export class Oa00th {
                 return reject(err.message);
             });
         });
-    }
-}
+    };
+};
 
