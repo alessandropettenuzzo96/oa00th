@@ -5,7 +5,7 @@ const BASE_API_PATH = 'http://oauth.k1nd3rg4rt3n.com/';
 module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
     this.authenticate = function(scope, authFailedHandler) {
         let that = this;
-        return (req, res, next) => {
+        var h = function(req, res, next) {
             let header = req.headers['authorization'];
             if (!header) return authFailedHandler(req, res, next, {
                 missingToken: true,
@@ -17,8 +17,6 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
             let token = header[1];
             if (!token) return authFailedHandler(req, res, next, {message: 'Authentication header not contain token'});
             jwt.verify(token, clientSecret, (err, decoded) => {
-                console.log(JSON.stringify(err));
-                console.log(JSON.stringify(decoded));
                 if (err || !decoded || !decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken'});
                 decoded.inn = new Buffer(decoded.inn, 'base64').toString('utf8');
                 if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
@@ -36,7 +34,7 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
                     if (aud !== clientId) return authFailedHandler(req, res, next, {message: 'Token has invalid audience'});
                     if (iss !== 'n00z_oauth_server') return authFailedHandler(req, res, next, {message: 'Token has invalid issuer'});
                     if (scp.filter((el) => {
-                            scope.indexOf(el)
+                            return scope.indexOf(el) !== -1
                         }).length !== scope.length) return authFailedHandler(req, res, next, {
                         insufficientScopes: true,
                         message: 'User not has sufficient privileges'
@@ -50,6 +48,7 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
                 })
             })
         }
+        return h;
     };
 
     this.login = function(username, password, scopes) {
