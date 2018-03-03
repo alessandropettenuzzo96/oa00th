@@ -20,35 +20,34 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
                 if (err || !decoded || !decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken'});
                 decoded.inn = (new Buffer(decoded.inn, 'base64')).toString('utf8');
                 if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
-                jwt.decode(decoded.inn, function(err, inner) {
-                    console.log("DECODED");
-                    console.log(JSON.stringify(err))
-                    console.log(JSON.stringify(inner))
-                    if (err || !inner || !inner.usr || !inner.exp || inner.iss || inner.aud || !inner.scp) return authFailedHandler(req, res, next, {message: 'Token not contain valid informations'});
-                    let usr = inner.usr;
-                    let exp = inner.exp;
-                    let aud = inner.aud;
-                    let scp = inner.scp.split(' ');
-                    let iss = inner.iss;
-                    if ((new Date()).getTime() >= exp) return authFailedHandler(req, res, next, {
-                        isExpired: true,
-                        message: 'Token is expired'
-                    });
-                    if (aud !== clientId) return authFailedHandler(req, res, next, {message: 'Token has invalid audience'});
-                    if (iss !== 'n00z_oauth_server') return authFailedHandler(req, res, next, {message: 'Token has invalid issuer'});
-                    if (scp.filter((el) => {
-                            return scope.indexOf(el) !== -1
-                        }).length !== scope.length) return authFailedHandler(req, res, next, {
-                        insufficientScopes: true,
-                        message: 'User not has sufficient privileges'
-                    });
-                    getUserFromId(usr).then((user) => {
-                        req.user = user;
-                        next();
-                    }).catch((err) => {
-                        authFailedHandler(req, res, next, err);
-                    });
-                })
+                let inner = jwt.decode(decoded.inn);
+                console.log("DECODED");
+                console.log(JSON.stringify(err))
+                console.log(JSON.stringify(inner))
+                if (err || !inner || !inner.usr || !inner.exp || inner.iss || inner.aud || !inner.scp) return authFailedHandler(req, res, next, {message: 'Token not contain valid informations'});
+                let usr = inner.usr;
+                let exp = inner.exp;
+                let aud = inner.aud;
+                let scp = inner.scp.split(' ');
+                let iss = inner.iss;
+                if ((new Date()).getTime() >= exp) return authFailedHandler(req, res, next, {
+                    isExpired: true,
+                    message: 'Token is expired'
+                });
+                if (aud !== clientId) return authFailedHandler(req, res, next, {message: 'Token has invalid audience'});
+                if (iss !== 'n00z_oauth_server') return authFailedHandler(req, res, next, {message: 'Token has invalid issuer'});
+                if (scp.filter((el) => {
+                        return scope.indexOf(el) !== -1
+                    }).length !== scope.length) return authFailedHandler(req, res, next, {
+                    insufficientScopes: true,
+                    message: 'User not has sufficient privileges'
+                });
+                getUserFromId(usr).then((user) => {
+                    req.user = user;
+                    next();
+                }).catch((err) => {
+                    authFailedHandler(req, res, next, err);
+                });
             })
         }
         return h;
