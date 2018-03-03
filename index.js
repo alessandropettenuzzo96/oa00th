@@ -20,7 +20,7 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
                 if (err || !decoded || !decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken'});
                 decoded.inn = (new Buffer(decoded.inn, 'base64')).toString('utf8');
                 if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
-                jwt.decode(decoded.inn, (err, inner) => {
+                jwt.decode(decoded.inn, function(err, inner) {
                     console.log("DECODED");
                     console.log(JSON.stringify(err))
                     console.log(JSON.stringify(inner))
