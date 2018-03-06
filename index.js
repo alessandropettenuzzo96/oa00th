@@ -22,11 +22,11 @@ module.exports.Oa00th = function (clientId, clientSecret, getUserFromId) {
                 if (!decoded.inn) return authFailedHandler(req, res, next, {message: 'Invalid AccessToken encoded format.'});
                 let inner = jwt.decode(decoded.inn);
                 console.log("DECODED");
-                if (err || !inner || !inner.usr || !inner.exp || !inner.iss || !inner.aud || !inner.scp) return authFailedHandler(req, res, next, {message: 'Token not contain valid informations'});
+                if (err || !inner || !inner.usr || !inner.exp || !inner.iss || !inner.aud ) return authFailedHandler(req, res, next, {message: 'Token not contain valid informations'});
                 let usr = inner.usr;
                 let exp = inner.exp;
                 let aud = inner.aud;
-                let scp = inner.scp.split(' ');
+                let scp = inner.scp ? inner.scp.split(' ') : [];
                 let iss = inner.iss;
                 if ((new Date()).getTime() >= exp) return authFailedHandler(req, res, next, {
                     isExpired: true,
